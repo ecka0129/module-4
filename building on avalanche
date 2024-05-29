@@ -1,0 +1,56 @@
+// SPDX-License-Identifier: MIT
+/*
+1. Minting new tokens: The platform should be able to create new tokens and distribute them to players as rewards. Only the owner can mint tokens.
+2. Transferring tokens: Players should be able to transfer their tokens to others.
+3. Redeeming tokens: Players should be able to redeem their tokens for items in the in-game store.
+4. Checking token balance: Players should be able to check their token balance at any time.
+5. Burning tokens: Anyone should be able to burn tokens, that they own, that are no longer needed.
+*/
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract EckaCoffeeShop is ERC20, Ownable {
+
+    mapping(uint256 => uint256) public coffeePrices;
+
+    constructor() ERC20("Ecka", "Coffee") Ownable(msg.sender) {
+        coffeePrices[1] = 140;  
+        coffeePrices[2] = 170;  
+        coffeePrices[3] = 200;  
+        coffeePrices[4] = 250; 
+    }
+
+    function mintTokens(address to, uint256 amount) public onlyOwner {
+        _mint(to, amount);
+    }
+
+    function sendTokens(address to, uint256 amount) public {
+        require(balanceOf(msg.sender) >= amount, "Transfer Failed: Tou don't have enough balance.");
+        transfer(to, amount);
+    }
+
+    function CoffeeList() external pure returns (string memory) {
+        return "Item Sales: {1} Tall Coffee (140) {2} Venti Coffee (170) {3} Grande Coffee (200) {4} Trenta Coffee (250)";
+    }
+
+    function purchaseItem(uint256 item) public {
+        require(coffeePrices[item] > 0, "Item is not available.");
+        require(balanceOf(msg.sender) >= coffeePrices[item], "Redeem Failed: Insufficient balance.");
+        _transfer(msg.sender, owner(), coffeePrices[item]);
+    }
+
+    function burnTokens(uint256 amount) public {
+        require(balanceOf(msg.sender) >= amount, "Burn Failed: You don't have enough balance.");
+        _burn(msg.sender, amount);
+    }
+
+    function checkBalance() external view returns (uint256) {
+        return balanceOf(msg.sender);
+    }   
+    
+    function decimals() public pure override returns (uint8) {
+        return 0;
+    }
+}
