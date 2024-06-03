@@ -33,7 +33,7 @@ contract EckaCoffeeShop is ERC20, Ownable {
     }
 
     function CoffeeList() external pure returns (string memory) {
-        return "Item Sales: {1} Small Booster (100) {2} Medium Booster (120) {3} Large Booster (150) {4} Extra Large Booster (200)";
+        return "Item Sales: {1} Tall Coffee (100) {2} Venti Coffee (120) {3} Grande Coffee (150) {4} Trenta Coffee (200)";
     }
 
     function purchaseItem(uint256 item) public {
