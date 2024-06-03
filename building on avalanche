@@ -14,12 +14,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract EckaCoffeeShop is ERC20, Ownable {
 
     mapping(uint256 => uint256) public coffeePrices;
+    mapping(address => mapping(uint256 => uint256)) public playerInventory;
 
     constructor() ERC20("Ecka", "Coffee") Ownable(msg.sender) {
-        coffeePrices[1] = 140;  
-        coffeePrices[2] = 170;  
-        coffeePrices[3] = 200;  
-        coffeePrices[4] = 250; 
+        coffeePrices[1] = 100;  
+        coffeePrices[2] = 120;  
+        coffeePrices[3] = 150;  
+        coffeePrices[4] = 200; 
     }
 
     function mintTokens(address to, uint256 amount) public onlyOwner {
@@ -27,18 +28,20 @@ contract EckaCoffeeShop is ERC20, Ownable {
     }
 
     function sendTokens(address to, uint256 amount) public {
-        require(balanceOf(msg.sender) >= amount, "Transfer Failed: Tou don't have enough balance.");
+        require(balanceOf(msg.sender) >= amount, "Transfer Failed: You don't have enough balance.");
         transfer(to, amount);
     }
 
     function CoffeeList() external pure returns (string memory) {
-        return "Item Sales: {1} Tall Coffee (140) {2} Venti Coffee (170) {3} Grande Coffee (200) {4} Trenta Coffee (250)";
+        return "Item Sales: {1} Small Booster (100) {2} Medium Booster (120) {3} Large Booster (150) {4} Extra Large Booster (200)";
     }
 
     function purchaseItem(uint256 item) public {
         require(coffeePrices[item] > 0, "Item is not available.");
         require(balanceOf(msg.sender) >= coffeePrices[item], "Redeem Failed: Insufficient balance.");
         _transfer(msg.sender, owner(), coffeePrices[item]);
+
+        playerInventory[msg.sender][item] += 1; // Add the purchased item to the player's inventory
     }
 
     function burnTokens(uint256 amount) public {
@@ -49,7 +52,11 @@ contract EckaCoffeeShop is ERC20, Ownable {
     function checkBalance() external view returns (uint256) {
         return balanceOf(msg.sender);
     }   
-    
+
+    function checkInventory(uint256 item) public view returns (uint256) {
+        return playerInventory[msg.sender][item];
+    }
+
     function decimals() public pure override returns (uint8) {
         return 0;
     }
